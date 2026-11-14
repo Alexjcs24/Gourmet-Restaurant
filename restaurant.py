@@ -116,6 +116,15 @@ def generar_factura(nombre_cliente="Consumidor Final"):
     except Exception as e:
         print(f"\nNota: Factura generada (no se pudo escribir archivo: {e})")
 
+    # Persistencia en PostgreSQL si el modulo esta disponible
+    try:
+        import crud_restaurante as cr
+        id_ped = cr.guardar_pedido_bd(nombre_cliente, orden_actual, subtotal, iva, total)
+        if id_ped:
+            print(f"[PostgreSQL] Pedido registrado en la base de datos con ID #{id_ped}.")
+    except Exception:
+        pass
+
     # Limpiar orden luego de pagar
     orden_actual.clear()
     return True

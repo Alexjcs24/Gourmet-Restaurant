@@ -8,6 +8,7 @@
 import titles as t
 import menu as m
 import restaurant as rt
+import crud_restaurante as cr
 
 
 def menu_pedidos_categoria(categoria_nombre):
@@ -42,7 +43,48 @@ def menu_pedidos_categoria(categoria_nombre):
             break
 
 
+def menu_administrador():
+    """Submenú de Gestión y Operaciones CRUD con la base de datos PostgreSQL."""
+    while True:
+        t.limpiar_pantalla()
+        print("=" * 50)
+        print("    PANEL DE ADMINISTRACIÓN Y BASE DE DATOS    ")
+        print("=" * 50)
+        print("1. Registrar nuevo plato (INSERT)")
+        print("2. Consultar plato específico (SELECT)")
+        print("3. Consultar todos los platos en PostgreSQL (SELECT)")
+        print("4. Actualizar información de un plato (UPDATE)")
+        print("5. Retirar plato de la carta (DELETE)")
+        print("0. Volver al Menú Principal")
+        print("=" * 50)
+
+        op = input("Seleccione una opción (0-5): ").strip()
+        if op == "1":
+            cr.registrar_plato()
+            input("\nPresione ENTER para continuar...")
+        elif op == "2":
+            cr.consultaxplato()
+            input("\nPresione ENTER para continuar...")
+        elif op == "3":
+            cr.consulta_todos_platos()
+            input("\nPresione ENTER para continuar...")
+        elif op == "4":
+            cr.actualiza_plato()
+            input("\nPresione ENTER para continuar...")
+        elif op == "5":
+            cr.deletplato()
+            input("\nPresione ENTER para continuar...")
+        elif op == "0":
+            break
+        else:
+            print("Opción no válida.")
+            input("\nPresione ENTER para continuar...")
+
+
 def main():
+    # Establecer conexion con PostgreSQL (estilo explicado por el docente)
+    cr.conectar_bd("restaurante_gourmet", "alexcs", "", "localhost", "5432")
+
     t.limpiar_pantalla()
     t.banner_bienvenida()
 
@@ -62,10 +104,11 @@ def main():
         print("4. Ver Orden y Total")
         print("5. Confirmar Pedido y Facturar")
         print("6. Cancelar Orden Actual")
+        print("7. Panel de Base de Datos y CRUD (Admin)")
         print("0. Salir del Sistema")
         print("=" * 45)
 
-        opcion = input("Seleccione una opción (0-6): ").strip()
+        opcion = input("Seleccione una opción (0-7): ").strip()
 
         match opcion:
             case "1":
@@ -95,11 +138,14 @@ def main():
             case "6":
                 rt.cancelar_orden()
                 input("\nPresione ENTER para continuar...")
+            case "7":
+                menu_administrador()
             case "0":
+                cr.terminar()
                 print("\n¡Gracias por preferir Restaurante Gourmet! Que tenga un feliz día.")
                 break
             case _:
-                print("\nOpción no válida. Por favor elija un número entre 0 y 6.")
+                print("\nOpción no válida. Por favor elija un número entre 0 y 7.")
 
 
 if __name__ == "__main__":
