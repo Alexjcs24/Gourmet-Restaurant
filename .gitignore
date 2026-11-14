@@ -15,3 +15,7 @@ ENV/
 .idea/
 *.swp
 *.swo
+
+# Facturas generadas
+factura_*.txt
+
