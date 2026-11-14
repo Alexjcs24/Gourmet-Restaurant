@@ -1,45 +1,37 @@
-# 🍽️ Gourmet Restaurant
+# Gourmet Restaurant - Fase 3
 
-Sistema modular en consola para la toma de pedidos y facturación de un restaurante.
+Proyecto universitario de gestión para restaurante desarrollado en Python.
 
----
-
-## 👥 Integrantes del Proyecto
-
-- **Jesús Esteban Muñoz Gómez**
-- **Albeiro Andrés Rodgers Pérez**
-- **Alex Javier Campo Suárez**
+## Integrantes
+* Jesús Esteban Muñoz Gómez
+* Albeiro Andrés Rodgers Pérez
+* Alex Javier Campo Suárez
 
 ---
 
-## 📁 Estructura del Código
+## Estructura del Proyecto
 
-El proyecto está dividido en 4 módulos en Python:
-
-| Archivo | Responsabilidad |
-| :--- | :--- |
-| **[`main.py`](main.py)** | Punto de entrada del programa. Controla el menú interactivo, la selección de opciones y la navegación entre categorías. |
-| **[`menu.py`](menu.py)** | Catálogo de platos (`PLATOS`) organizados por Desayunos, Almuerzos y Postres, junto con las funciones para listarlos en consola. |
-| **[`restaurant.py`](restaurant.py)** | Gestión de la orden activa (agregar productos, calcular subtotal, impoconsumo del 8% y total), cancelación de orden y exportación de la factura a archivo `.txt`. |
-| **[`titles.py`](titles.py)** | Encabezados de texto formateados para cada sección y función para limpiar la consola. |
+* **`main.py`**: Punto de entrada del programa. Controla el menú interactivo, la navegación por categorías y el flujo de facturación.
+* **`menu.py`**: Catálogo general de productos (`PLATOS`). Contiene los desayunos, almuerzos y postres organizados con códigos, precios y descripciones.
+* **`restaurant.py`**: Lógica de gestión de pedidos. Maneja el carrito (`orden_actual`), cálculo de subtotales, impoconsumo (8%) y generación de factura.
+* **`titles.py`**: Formatos visuales, banners, encabezados y la función para limpiar pantalla en cualquier sistema operativo.
 
 ---
 
-## 🚀 Requisitos y Ejecución
+## Cómo ejecutar el proyecto en VS Code
 
-### Requisitos
-- **Python 3.10 o superior** (el proyecto utiliza la sentencia de coincidencia de patrones `match / case` introducida en Python 3.10).
-
-### Cómo ejecutar el programa
-```bash
-python3 main.py
-```
-*(En Windows ejecutar con `python main.py`)*
+1. Abrir la carpeta del proyecto en Visual Studio Code.
+2. Abrir la terminal integrada (`Ctrl + Ñ` o `Terminal -> New Terminal`).
+3. Ejecutar el comando:
+   ```bash
+   python main.py
+   ```
+   *(En Linux / Mac: `python3 main.py`)*
 
 ---
 
-## ⚙️ Funcionamiento y Reglas de Negocio
-
-- **Categorías disponibles:** Desayunos, Almuerzos y Postres.
-- **Impuestos aplicados:** Impuesto Nacional al Consumo (**Impoconsumo del 8%**) sobre el subtotal acumulado.
-- **Facturación:** Al confirmar el pedido, además de mostrar el detalle en pantalla, se genera un archivo de texto con el comprobante de la compra (`factura_<cliente>.txt`).
+## Funcionalidades
+1. **Navegación por categorías:** Selección clara de Desayunos, Almuerzos y Postres.
+2. **Carrito interactivo:** Permite agregar múltiples platos indicando cantidades sin romper la ejecución.
+3. **Cálculo automático:** Subtotales, 8% de impoconsumo y total a pagar.
+4. **Emisión de factura:** Imprime la factura en pantalla y guarda automáticamente un respaldo en `factura_venta.txt`.
