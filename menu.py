@@ -1,120 +1,192 @@
-#!/usr/bin/env python
-#variables a definir
+#!/usr/bin/env python3
+# menu.py
+# NOMBRES DE LOS INTEGRANTES DEL PROYECTO:
+# JESUS ESTEBAN MUNOZ GOMEZ
+# ALBEIRO ANDRES RODGERS PEREZ
+# ALEX JAVIER CAMPO SUAREZ
 
-#codigo_plato: str
-#nombre_plato: str
-#categoria: str
-#disponible: bool
-#cantidad: int
-#cantidadMax: int
-#subtotal: float
-#selection: str
+import titles as t
 
-#NOMBRES DE LOS INTEGRANTES DEL PROYECTO:
-#JESUS ESTEBAN MUNOZ GOMEZ
-#ALBEIRO ANDRES RODGERS PEREZ
+# Base de datos de platos por categoria
+# Estructura: codigo, nombre, precio, descripcion, categoria
+PLATOS = {
+    # --- DESAYUNOS ---
+    "1": {
+        "nombre": "Croissant Pistacho",
+        "precio": 12000,
+        "descripcion": "Croissant hojaldrado relleno de crema de pistacho artesanal.",
+        "categoria": "Desayuno"
+    },
+    "2": {
+        "nombre": "Huevos Puntilla",
+        "precio": 9500,
+        "descripcion": "Huevos fritos con borde crujiente al estilo tradicional campesino.",
+        "categoria": "Desayuno"
+    },
+    "3": {
+        "nombre": "Tostada Parisina",
+        "precio": 11000,
+        "descripcion": "Pan brioche dorado con mantequilla, queso gruyère y jamón.",
+        "categoria": "Desayuno"
+    },
+    "4": {
+        "nombre": "Croissant Lemon",
+        "precio": 10500,
+        "descripcion": "Croissant relleno de suave crema de limón y glaseado.",
+        "categoria": "Desayuno"
+    },
+    "5": {
+        "nombre": "Pan de Nuez",
+        "precio": 6500,
+        "descripcion": "Pan artesanal horneado con nueces seleccionadas.",
+        "categoria": "Desayuno"
+    },
+    "6": {
+        "nombre": "Arepa de Huevo",
+        "precio": 6000,
+        "descripcion": "Típica arepa costeña de maíz amarillo rellena con huevo frito.",
+        "categoria": "Desayuno"
+    },
+    "7": {
+        "nombre": "Empanada de Carne",
+        "precio": 4500,
+        "descripcion": "Empanada crujiente rellena de carne desmechada sazonada.",
+        "categoria": "Desayuno"
+    },
+    "8": {
+        "nombre": "Empanada de Pollo",
+        "precio": 4500,
+        "descripcion": "Empanada crocante rellena de pechuga de pollo y guiso casero.",
+        "categoria": "Desayuno"
+    },
+    "9": {
+        "nombre": "Empanada Hawaiana",
+        "precio": 4500,
+        "descripcion": "Empanada rellena de jamón, queso derretido y piña calada.",
+        "categoria": "Desayuno"
+    },
+
+    # --- ALMUERZOS ---
+    "10": {
+        "nombre": "Chicken Parm",
+        "precio": 28000,
+        "descripcion": "Pechuga empanizada con salsa marinara casera y queso mozzarella gratinado.",
+        "categoria": "Almuerzo"
+    },
+    "11": {
+        "nombre": "Pollo Toscano",
+        "precio": 29500,
+        "descripcion": "Pechuga en salsa cremosa de tomates secos, espinacas y ajo.",
+        "categoria": "Almuerzo"
+    },
+    "12": {
+        "nombre": "Pollo a la Cacerola",
+        "precio": 26000,
+        "descripcion": "Guiso tradicional de pollo cocinado a fuego lento con vegetales y papas.",
+        "categoria": "Almuerzo"
+    },
+    "13": {
+        "nombre": "Paella Mixta",
+        "precio": 35000,
+        "descripcion": "Arroz español con mariscos variados, pollo, cerdo y azafrán.",
+        "categoria": "Almuerzo"
+    },
+    "14": {
+        "nombre": "Salmón Pataraska",
+        "precio": 38000,
+        "descripcion": "Filete de salmón fresco envuelto en hoja de plátano con especias autóctonas.",
+        "categoria": "Almuerzo"
+    },
+
+    # --- POSTRES ---
+    "15": {
+        "nombre": "Tiramisú",
+        "precio": 16900,
+        "descripcion": "Postre italiano con capas de bizcocho al café, crema de queso y cacao.",
+        "categoria": "Postre"
+    },
+    "16": {
+        "nombre": "Volcán de Arequipe",
+        "precio": 17900,
+        "descripcion": "Bizcocho tibio con centro fundido de arequipe, fresas y helado de vainilla.",
+        "categoria": "Postre"
+    },
+    "17": {
+        "nombre": "Volcán de Chocolate",
+        "precio": 17900,
+        "descripcion": "Bizcocho con centro líquido de chocolate oscuro, fresas y helado de vainilla.",
+        "categoria": "Postre"
+    },
+    "18": {
+        "nombre": "Stromboli de Chocolate",
+        "precio": 17900,
+        "descripcion": "Capas de bizcocho suave con ganache de chocolate intenso y café.",
+        "categoria": "Postre"
+    },
+    "19": {
+        "nombre": "Gelato Cheese de Limón",
+        "precio": 7500,
+        "descripcion": "Helado cremoso de tarta de queso con notas de limón y crumble de galleta.",
+        "categoria": "Postre"
+    },
+    "20": {
+        "nombre": "Gelato Chocolate Dubai",
+        "precio": 17900,
+        "descripcion": "Gelato de chocolate fino, crema de pistacho tostado y crujiente de hojaldre.",
+        "categoria": "Postre"
+    },
+    "21": {
+        "nombre": "Gelato Pistaccio",
+        "precio": 7500,
+        "descripcion": "Helado artesanal elaborado con auténtico pistacho natural tostado.",
+        "categoria": "Postre"
+    },
+    "22": {
+        "nombre": "Tarta Vasca",
+        "precio": 15000,
+        "descripcion": "Clásica cheesecake horneada al estilo San Sebastián, tostada y cremosa.",
+        "categoria": "Postre"
+    },
+    "23": {
+        "nombre": "Baklava",
+        "precio": 13500,
+        "descripcion": "Dulce turco de masa filo relleno de nueces picadas y bañado en miel.",
+        "categoria": "Postre"
+    },
+    "24": {
+        "nombre": "Torta de Almojábana",
+        "precio": 11000,
+        "descripcion": "Postre tradicional a base de maíz y cuajada con toque de caramelo.",
+        "categoria": "Postre"
+    },
+    "25": {
+        "nombre": "Helado Napolitano",
+        "precio": 6500,
+        "descripcion": "Combinación clásica de tres sabores: fresa, vainilla y chocolate.",
+        "categoria": "Postre"
+    }
+}
 
 
-import subprocess
+def mostrar_categoria(categoria_filtro):
+    """Muestra los platos correspondientes a una categoria dada."""
+    if categoria_filtro == "Desayuno":
+        t.breakfast_menu()
+    elif categoria_filtro == "Almuerzo":
+        t.midfood_menu()
+    elif categoria_filtro == "Postre":
+        t.desserts_menu()
 
-precio: float
-caantidad: int
-
-#aqui hago varias funciones con menus para definir cada tipo de comida del restaurante
-
-#categoria: postres
-
-def menuPostres():
-    #menu de postres
-    subprocess.call(["cmd.exe", "/C", "cls"])
-    print("##############")
-    print("##  POSTRES ##")
-    print("#############")
-
-    print("1. Tiramisú ")
-    print("2. Volcán de arequipe ")
-    print("3. Volcán de chocolate ")
-    print("4. Tres Leches ")
-    print("5. Gelato Cheese de Limón ")
-    print("6. Gelato Chocolate Dubai ")
-    print("7. Gelato Pistaccio ")
-    print("8. Banana Split ")
-    print("9. Helado Napolitano ")
-    print("0. Salir ")
-    selection = input("Que opcion Deseas escoger: \n ")
-
-    match selection:
-        case 1:
-            subprocess.call(["cmd.exe", "/C", "cls"])
-            print("### TIRAMISU ###")
-            print("Descripcion:")
-            print("Postre italiano con capas de bizcocho al café, crema de queso y licor, espolvoreado con cocoa.")
-            print(f"PRECIO: ")
-            print("16.900$")
-            precio = 16900
-        case 2:
-            subprocess.call(["cmd.exe", "/C", "cls"])
-            print("### VOLCAN DE AREQUIPE ###")
-            print("DESCRIPCION:")
-            print("Volcán con centro fundido de arequipe, fresas frescas y gelato de vainilla.")
-            print(f"PRECIO: ")
-            print("17.900$")
-            precio = 17900
-
-        case 3:
-            subprocess.call(["cmd.exe", "/C", "cls"])
-            print("### VOLCAN DE CHOCOLATE ###")
-            print("DESCRIPCION:")
-            print("Volcán con centro fundido de chocolate, fresas frescas y gelato de vainilla.")
-            print(f"PRECIO: ")
-            print("17.900$")
-            precio = 17900
-        case 4:
-            subprocess.call(["cmd.exe", "/C", "cls"])
-            print("### STROMBOLI DE CHOCOLATE ###")
-            print("DESCRIPCION:")
-            print("Capas de bizcocho, crema de café sedosa y ganache de chocolate intenso.")
-            print(f"PRECIO: ")
-            print("17.900$")
-            precio = 17900
-        case 5:
-            subprocess.call(["cmd.exe", "/C", "cls"])
-            print("### GELATO CHEESE DE LIMON ###")
-            print("DESCRIPCION:")
-            print("Tarta de queso con limón y galleta triturada.")
-            print(f"PRECIO: ")
-            print("7.500$")
-            precio = 7500
-        case 6:
-            subprocess.call(["cmd.exe", "/C", "cls"])
-            print("### GELATO CHOCOLATE DUBAI ###")
-            print("DESCRIPCION:")
-            print("Gelato de chocolate oscuro, crema de pistacchio tostado y trozos de hojaldre")
-            print(f"PRECIO: ")
-            print("17.900$")
-            precio = 17900
-        case 7:
-            subprocess.call(["cmd.exe", "/C", "cls"])
-            print("### GELATO PISTACCIO ###")
-            print("DESCRIPCION:")
-            print("Gelato hecho con auténtico pistacchio tostado sin sabores artificiales")
-            print(f"PRECIO: ")
-            print("7.500$")
-            precio = 7500
-            pass
-
-
-print("-- RESTAURANT GOURMET --")
-print("!!Bienvenidos a nuestro pequeno emprendimiento!! ")
-
-#esta variable es para seleccionar darle al cliente la opcion para ingresar al menu
-selection = input("Deseas ingresar a nuestro menu?S/n")
-
-if (selection != "s" or selection != "n"):
-    print("ERROR: seleccion no valida")
-elif (selection == "s" or selection == "S"):
-    print(menuPostres())
-
-
-
-
+    print(f"{'Cod':<5}{'Plato':<30}{'Precio':>10}")
+    print("-" * 47)
+    
+    encontrados = []
+    for cod, datos in PLATOS.items():
+        if datos["categoria"] == categoria_filtro:
+            encontrados.append(cod)
+            precio_fmt = f"${datos['precio']:,}".replace(",", ".")
+            print(f"[{cod:>2}] {datos['nombre']:<28} {precio_fmt:>12}")
+            print(f"      -> {datos['descripcion']}")
+            print()
+    print("-" * 47)
+    return encontrados
