@@ -1,6 +1,6 @@
 # 🍽️ Gourmet Restaurant
 
-Sistema modular de pedidos, gestión de comandas y facturación interactiva para un restaurante por consola en Python.
+Sistema modular en consola para la toma de pedidos y facturación de un restaurante.
 
 ---
 
@@ -12,43 +12,34 @@ Sistema modular de pedidos, gestión de comandas y facturación interactiva para
 
 ---
 
-## 📁 Estructura del Proyecto
+## 📁 Estructura del Código
 
-El código está organizado de forma modular para que sea fácil de mantener y extender:
+El proyecto está dividido en 4 módulos en Python:
 
-| Archivo | Descripción |
+| Archivo | Responsabilidad |
 | :--- | :--- |
-| **[`main.py`](main.py)** | **Punto de entrada principal**. Maneja el flujo de la aplicación, interacción con el usuario, selección de categorías y navegación del menú. |
-| **[`menu.py`](menu.py)** | **Catálogo de platos y bebidas**. Contiene el diccionario centralizado `PLATOS` con códigos, nombres, precios y categorías, además de las funciones para visualizarlos en pantalla. |
-| **[`restaurant.py`](restaurant.py)** | **Lógica del pedido y facturación**. Administra la lista de pedidos activos, cálculo de subtotales, IVA (19%), propina voluntaria (10%) y generación del comprobante fiscal. |
-| **[`titles.py`](titles.py)** | **Diseño visual e interfaces**. Banners ASCII, encabezados formateados y utilidades de consola (como limpieza de pantalla). |
+| **[`main.py`](main.py)** | Punto de entrada del programa. Controla el menú interactivo, la selección de opciones y la navegación entre categorías. |
+| **[`menu.py`](menu.py)** | Catálogo de platos (`PLATOS`) organizados por Desayunos, Almuerzos y Postres, junto con las funciones para listarlos en consola. |
+| **[`restaurant.py`](restaurant.py)** | Gestión de la orden activa (agregar productos, calcular subtotal, impoconsumo del 8% y total), cancelación de orden y exportación de la factura a archivo `.txt`. |
+| **[`titles.py`](titles.py)** | Encabezados de texto formateados para cada sección y función para limpiar la consola. |
 
 ---
 
 ## 🚀 Requisitos y Ejecución
 
 ### Requisitos
-- **Python 3.8** o superior (no requiere librerías externas adicionales).
+- **Python 3.10 o superior** (el proyecto utiliza la sentencia de coincidencia de patrones `match / case` introducida en Python 3.10).
 
-### Cómo ejecutar el proyecto
-1. Clona el repositorio (si aún no lo tienes):
-   ```bash
-   git clone https://github.com/Alexjcs24/Gourmet-Restaurant.git
-   cd Gourmet-Restaurant
-   ```
-
-2. Ejecuta el archivo principal:
-   ```bash
-   python3 main.py
-   ```
-   *(En Windows puedes usar `python main.py`)*
+### Cómo ejecutar el programa
+```bash
+python3 main.py
+```
+*(En Windows ejecutar con `python main.py`)*
 
 ---
 
-## 💡 Guía para Colaboradores
+## ⚙️ Funcionamiento y Reglas de Negocio
 
-Si vas a agregar o editar contenido:
-- **Agregar nuevos platos o cambiar precios:** Edita únicamente el diccionario `PLATOS` dentro de [`menu.py`](menu.py).
-- **Modificar cálculos o la factura:** Revisa [`restaurant.py`](restaurant.py).
-- **Personalizar textos o banners:** Edita [`titles.py`](titles.py).
-- **Nuevas opciones de menú:** Conéctalas en el bucle interactivo de [`main.py`](main.py).
+- **Categorías disponibles:** Desayunos, Almuerzos y Postres.
+- **Impuestos aplicados:** Impuesto Nacional al Consumo (**Impoconsumo del 8%**) sobre el subtotal acumulado.
+- **Facturación:** Al confirmar el pedido, además de mostrar el detalle en pantalla, se genera un archivo de texto con el comprobante de la compra (`factura_<cliente>.txt`).
