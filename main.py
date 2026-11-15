@@ -13,7 +13,11 @@ import crud_restaurante as cr
 
 def menu_pedidos_categoria(categoria_nombre):
     """Muestra los platos de una categoria y permite seleccionar plato y cantidad."""
-    m.mostrar_categoria(categoria_nombre)
+    disponibles = m.mostrar_categoria(categoria_nombre)
+    if not disponibles:
+        input("\nPresione ENTER para volver al Menú Principal...")
+        return
+
     while True:
         cod = input("\nIngrese el código del plato que desea agregar (o 0 para volver): ").strip()
         if cod == "0":
@@ -50,7 +54,7 @@ def menu_administrador():
         print("=" * 50)
         print("    PANEL DE ADMINISTRACIÓN Y BASE DE DATOS    ")
         print("=" * 50)
-        estado_bd = "CONECTADO A POSTGRESQL" if cr.esta_conectado() else "MODO LOCAL (SIN CONEXIÓN BD)"
+        estado_bd = cr.obtener_estado_conexion()
         print(f" Estado: [{estado_bd}]")
         print("-" * 50)
         print("1. Registrar nuevo plato (INSERT)")
@@ -109,7 +113,7 @@ def main():
         return
 
     while True:
-        estado_bd = "PostgreSQL Conectado" if cr.esta_conectado() else "Modo Local (Sin BD)"
+        estado_bd = cr.obtener_estado_conexion()
         print("\n" + "=" * 45)
         print("             MENÚ PRINCIPAL            ")
         print(f"       [{estado_bd}]")

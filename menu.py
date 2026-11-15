@@ -188,5 +188,10 @@ def mostrar_categoria(categoria_filtro):
             print(f"[{cod:>2}] {datos['nombre']:<28} {precio_fmt:>12}")
             print(f"      -> {datos['descripcion']}")
             print()
+
+    if not encontrados:
+        print("  Actualmente no hay platos disponibles en esta categoría.")
+        print()
+
     print("-" * 47)
     return encontrados

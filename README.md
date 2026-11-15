@@ -1,6 +1,6 @@
 # Gourmet Restaurant - Fase 3 (Proyecto ABP)
 
-Sistema interactivo de gestión para restaurante desarrollado en Python con persistencia en **PostgreSQL**.
+Sistema interactivo de gestión para restaurante desarrollado en Python con persistencia en **PostgreSQL** y compatibilidad multiplataforma (**Windows**, **Linux**, **macOS**).
 
 ## 👥 Integrantes
 * Jesús Esteban Muñoz Gómez
@@ -23,8 +23,8 @@ Sistema interactivo de gestión para restaurante desarrollado en Python con pers
 ## ⚙️ Requisitos Previos e Instalación
 
 ### 1. Requisitos
-* Python 3.10 o superior.
-* PostgreSQL 12 o superior (opcional; si no está activo, el sistema funciona normalmente en modo local).
+* Python 3.10 o superior (Windows, Linux o macOS).
+* PostgreSQL 12 o superior (opcional; si no está activo o instalado, el sistema arranca limpiamente en **Modo Local**).
 
 ### 2. Dependencias de Python
 Instalar el conector de PostgreSQL para Python:
@@ -55,14 +55,34 @@ psql -d restaurante_gourmet -f restaurante.sql
 *(O copie y pegue el contenido de `restaurante.sql` en la herramienta Query Tool de pgAdmin).*
 
 ### Paso 3: Variables de Conexión (Opcional)
-Por defecto el sistema intentará conectarse usando tu usuario del sistema o el usuario estándar `postgres`. Si tu PostgreSQL requiere credenciales específicas, puedes configurarlas en la terminal antes de iniciar:
-```bash
-export DB_NAME="restaurante_gourmet"
-export DB_USER="tu_usuario_postgres"
-export DB_PASSWORD="tu_password"
-export DB_HOST="localhost"
-export DB_PORT="5432"
-```
+El sistema detecta automáticamente al usuario del sistema (`$USER` en Linux/Mac y `%USERNAME%` en Windows) o el usuario estándar `postgres`. Si tu PostgreSQL requiere credenciales o puertos personalizados, configúralos antes de ejecutar:
+
+* **En Linux / macOS:**
+  ```bash
+  export DB_NAME="restaurante_gourmet"
+  export DB_USER="tu_usuario"
+  export DB_PASSWORD="tu_password"
+  export DB_HOST="localhost"
+  export DB_PORT="5432"
+  ```
+
+* **En Windows (CMD):**
+  ```cmd
+  set DB_NAME=restaurante_gourmet
+  set DB_USER=tu_usuario
+  set DB_PASSWORD=tu_password
+  set DB_HOST=localhost
+  set DB_PORT=5432
+  ```
+
+* **En Windows (PowerShell):**
+  ```powershell
+  $env:DB_NAME="restaurante_gourmet"
+  $env:DB_USER="tu_usuario"
+  $env:DB_PASSWORD="tu_password"
+  $env:DB_HOST="localhost"
+  $env:DB_PORT="5432"
+  ```
 
 ---
 
@@ -70,23 +90,28 @@ export DB_PORT="5432"
 
 1. Abrir la terminal en la carpeta del proyecto.
 2. Ejecutar el comando:
-   ```bash
-   python main.py
-   ```
-   *(En Linux / Mac: `python3 main.py`)*
+   * **En Windows:**
+     ```bash
+     python main.py
+     ```
+   * **En Linux / macOS:**
+     ```bash
+     python3 main.py
+     ```
 
 ---
 
 ## 📋 Funcionalidades Principales
 
-1. **Tolerancia a fallos:** Si PostgreSQL está apagado o no instalado, el sistema arranca limpiamente en **Modo Local** mostrando el estado en pantalla sin romperse.
+1. **Tolerancia a fallos:** Si PostgreSQL está apagado o no instalado, el sistema arranca limpiamente en **Modo Local** indicando en pantalla el motivo exacto (ej. falta de librería o base de datos no iniciada) sin romperse jamás.
 2. **Fuente de verdad única:** Si la base de datos está conectada, el menú de pedidos se actualiza desde PostgreSQL. Si registras, modificas o retiras un plato en la Opción 7 (Admin), la carta se actualiza de inmediato para los pedidos.
-3. **Panel de Administración (CRUD Completo):**
+3. **Manejo de categorías vacías:** Si una categoría no tiene platos disponibles, el sistema informa amablemente al usuario sin pedir códigos inexistentes.
+4. **Panel de Administración (CRUD Completo):**
    * **`INSERT`**: Registrar nuevos platos con validación de categorías y precio (o reactivar platos retirados).
    * **`SELECT`**: Consulta individual por código y listado tabular ordenado de la carta.
    * **`UPDATE`**: Modificación de nombres y precios.
    * **`DELETE`**: Retiro lógico (`disponible = FALSE`) protegiendo el histórico de pedidos.
-4. **Facturación y Transacciones:**
+5. **Facturación y Transacciones:**
    * Cálculo automático de subtotales, 8% de impoconsumo y total.
    * Exportación de recibo en `factura_venta.txt`.
    * Registro atómico en PostgreSQL en las tablas `pedidos` y `detalle_pedidos` con rollback automático si algo falla.

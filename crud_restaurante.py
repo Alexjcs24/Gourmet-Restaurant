@@ -19,11 +19,11 @@ except ImportError:
 
 # Variable global de conexión
 conexion = None
+motivo_desconexion = "No inicializado"
 
 
 def esta_conectado():
     """Verifica si existe una conexión activa y válida a la base de datos."""
-    global conexion
     if conexion is None:
         return False
     try:
@@ -32,16 +32,27 @@ def esta_conectado():
         return False
 
 
+def obtener_estado_conexion():
+    """Retorna una cadena descriptiva con el estado actual de la conexión."""
+    if esta_conectado():
+        return "PostgreSQL Conectado"
+    if not HAY_PSYCOPG2:
+        return "Modo Local (Falta psycopg2)"
+    return f"Modo Local ({motivo_desconexion})"
+
+
 def conectar_bd(dbname=None, user=None, password=None, host=None, port=None):
     """Establece la conexión global con PostgreSQL.
     Retorna True si conecta, o False si continúa en modo local."""
-    global conexion
+    global conexion, motivo_desconexion
 
     if not HAY_PSYCOPG2:
+        motivo_desconexion = "Falta librería psycopg2"
         return False
 
     db = dbname or os.environ.get("DB_NAME", "restaurante_gourmet")
-    usuario = user or os.environ.get("DB_USER") or os.environ.get("USER", "postgres")
+    # Soporte multiplataforma: USER (Linux/Mac) y USERNAME (Windows)
+    usuario = user or os.environ.get("DB_USER") or os.environ.get("USER") or os.environ.get("USERNAME", "postgres")
     clave = password if password is not None else os.environ.get("DB_PASSWORD", "")
     servidor = host or os.environ.get("DB_HOST", "localhost")
     puerto = port or os.environ.get("DB_PORT", "5432")
@@ -49,19 +60,22 @@ def conectar_bd(dbname=None, user=None, password=None, host=None, port=None):
     # 1. Intentar con parámetros especificados o variables de entorno
     try:
         conexion = p.connect(dbname=db, user=usuario, password=clave, host=servidor, port=puerto)
+        motivo_desconexion = ""
         return True
-    except Exception:
-        pass
+    except Exception as e:
+        motivo_desconexion = "PostgreSQL no disponible o credenciales inválidas"
 
     # 2. Intento de respaldo estándar (usuario del sistema o postgres local)
     try:
         conexion = p.connect(dbname=db, user=usuario)
+        motivo_desconexion = ""
         return True
     except Exception:
         pass
 
     try:
         conexion = p.connect(dbname=db, user="postgres")
+        motivo_desconexion = ""
         return True
     except Exception:
         pass
