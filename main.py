@@ -109,8 +109,10 @@ def main():
         return
 
     while True:
+        estado_bd = "PostgreSQL Conectado" if cr.esta_conectado() else "Modo Local (Sin BD)"
         print("\n" + "=" * 45)
         print("             MENÚ PRINCIPAL            ")
+        print(f"       [{estado_bd}]")
         print("=" * 45)
         print("1. Menú de Desayunos")
         print("2. Menú de Almuerzos")

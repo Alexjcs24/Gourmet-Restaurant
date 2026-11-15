@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 # crud_restaurante.py
-# Modulo de funciones CRUD y persistencia con PostgreSQL
+# Módulo de funciones CRUD y persistencia con PostgreSQL
 # PROYECTO INTEGRADOR ABP - FASE 3
 # Integrantes:
-#   - Jesus Esteban Munoz Gomez
-#   - Albeiro Andres Rodgers Perez
-#   - Alex Javier Campo Suarez
+#   - Jesús Esteban Muñoz Gómez
+#   - Albeiro Andrés Rodgers Pérez
+#   - Alex Javier Campo Suárez
 
 import os
 
-# Import seguro de psycopg2 para evitar ModuleNotFoundError si no esta instalado
+# Import seguro de psycopg2 para evitar ModuleNotFoundError si no está instalado
 try:
     import psycopg2 as p
     HAY_PSYCOPG2 = True
@@ -17,69 +17,90 @@ except ImportError:
     p = None
     HAY_PSYCOPG2 = False
 
-# Variable global de conexion
+# Variable global de conexión
 conexion = None
 
 
 def esta_conectado():
-    """Verifica si existe una conexion activa y valida a la base de datos."""
+    """Verifica si existe una conexión activa y válida a la base de datos."""
     global conexion
     if conexion is None:
         return False
     try:
-        if conexion.closed != 0:
-            return False
-        return True
+        return conexion.closed == 0
     except Exception:
         return False
 
 
 def conectar_bd(dbname=None, user=None, password=None, host=None, port=None):
-    """Establece la conexion global con PostgreSQL con deteccion inteligente de entorno."""
+    """Establece la conexión global con PostgreSQL.
+    Retorna True si conecta, o False si continúa en modo local."""
     global conexion
 
     if not HAY_PSYCOPG2:
-        print("\n[AVISO BD] La librería 'psycopg2' no está instalada.")
-        print("           El sistema funcionará en MODO LOCAL (sin conexión a base de datos).")
-        print("           Para activar PostgreSQL ejecute: pip install psycopg2-binary\n")
         return False
 
-    # Parametros por variables de entorno o defaults
     db = dbname or os.environ.get("DB_NAME", "restaurante_gourmet")
     usuario = user or os.environ.get("DB_USER") or os.environ.get("USER", "postgres")
     clave = password if password is not None else os.environ.get("DB_PASSWORD", "")
     servidor = host or os.environ.get("DB_HOST", "localhost")
     puerto = port or os.environ.get("DB_PORT", "5432")
 
-    # Intentos de conexion en orden de probabilidad
-    intentos = [
-        # 1. Con los parametros especificados
-        lambda: p.connect(dbname=db, user=usuario, password=clave, host=servidor, port=puerto),
-        # 2. Conexión socket local (Linux/Mac peer auth)
-        lambda: p.connect(dbname=db, user=usuario),
-        # 3. Usuario estándar 'postgres' sin contraseña
-        lambda: p.connect(dbname=db, user="postgres", host=servidor, port=puerto),
-        # 4. Usuario estándar 'postgres' socket local
-        lambda: p.connect(dbname=db, user="postgres"),
-        # 5. Default libpq del sistema
-        lambda: p.connect(dbname=db)
-    ]
+    # 1. Intentar con parámetros especificados o variables de entorno
+    try:
+        conexion = p.connect(dbname=db, user=usuario, password=clave, host=servidor, port=puerto)
+        return True
+    except Exception:
+        pass
 
-    for intento in intentos:
-        try:
-            conexion = intento()
-            return True
-        except Exception:
-            continue
+    # 2. Intento de respaldo estándar (usuario del sistema o postgres local)
+    try:
+        conexion = p.connect(dbname=db, user=usuario)
+        return True
+    except Exception:
+        pass
 
-    print(f"\n[AVISO BD] No se pudo conectar a la base de datos '{db}'.")
-    print("           El sistema continuará en MODO LOCAL con el catálogo interno de respaldo.")
-    print("           Si desea usar PostgreSQL, verifique que el servicio esté iniciado y la BD creada.\n")
+    try:
+        conexion = p.connect(dbname=db, user="postgres")
+        return True
+    except Exception:
+        pass
+
     return False
 
 
+def pedir_datos_plato():
+    """Pide y valida interactivamente los datos de un plato (nombre, precio, descripcion, categoria)."""
+    nom = input("Ingrese el nombre del plato: ").strip()
+    if not nom:
+        print("El nombre no puede estar vacío.")
+        return None
+
+    try:
+        precio = float(input("Ingrese el precio del plato: ").strip())
+        if precio <= 0:
+            print("El precio debe ser mayor a 0.")
+            return None
+    except ValueError:
+        print("El precio debe ser un número válido.")
+        return None
+
+    desc = input("Ingrese la descripción del plato: ").strip()
+    print("Categorías disponibles: 1-Desayuno, 2-Almuerzo, 3-Postre")
+    try:
+        cat = int(input("Seleccione el ID de categoría (1-3): ").strip())
+        if cat not in [1, 2, 3]:
+            print("Categoría no válida. Debe ser 1, 2 o 3.")
+            return None
+    except ValueError:
+        print("Debe ingresar un número entero (1, 2 o 3).")
+        return None
+
+    return nom, precio, desc, cat
+
+
 def registrar_plato():
-    """INSERT: Registra un nuevo plato en la base de datos."""
+    """INSERT: Registra un nuevo plato en la base de datos o reactiva uno retirado."""
     if not esta_conectado():
         print("\n[ERROR BD] No hay conexión activa a la base de datos PostgreSQL.")
         return False
@@ -94,19 +115,18 @@ def registrar_plato():
             print("El código no puede estar vacío.")
             return False
 
-        # Verificar si ya existe
-        cursor.execute("SELECT codigo, disponible FROM platos WHERE codigo = %s", (cod,))
+        # Verificar si el código ya existe
+        cursor.execute("SELECT codigo, disponible, nombre FROM platos WHERE codigo = %s", (cod,))
         existente = cursor.fetchone()
+
         if existente:
-            if not existente[1]:
-                # Estaba retirado, se puede reactivar/actualizar
-                reactivar = input("El plato existe pero está retirado. ¿Desea reactivarlo y actualizarlo? (s/n): ").strip().lower()
+            if not existente[1]:  # Está retirado
+                reactivar = input(f"El plato '{existente[2]}' existe pero está retirado. ¿Desea reactivarlo y actualizarlo? (s/n): ").strip().lower()
                 if reactivar == 's':
-                    nom = input("Ingrese el nuevo nombre del plato: ").strip()
-                    precio = float(input("Ingrese el precio del plato: ").strip())
-                    desc = input("Ingrese la descripción del plato: ").strip()
-                    print("Categorías disponibles: 1-Desayuno, 2-Almuerzo, 3-Postre")
-                    cat = int(input("Seleccione el ID de categoría (1-3): ").strip())
+                    datos = pedir_datos_plato()
+                    if not datos:
+                        return False
+                    nom, precio, desc, cat = datos
                     cursor.execute("""
                         UPDATE platos 
                         SET nombre = %s, precio = %s, descripcion = %s, id_categoria = %s, disponible = TRUE 
@@ -115,33 +135,29 @@ def registrar_plato():
                     conexion.commit()
                     sincronizar_con_menu()
                     print("-" * 40)
-                    print("¡Plato reactivado y actualizado exitosamente!")
+                    print(f"¡Plato '{nom}' (Cód: {cod}) reactivado y actualizado exitosamente!")
                     return True
                 else:
                     return False
             else:
-                print(f"Error: Ya existe un plato activo con el código '{cod}'.")
+                print(f"Error: Ya existe un plato activo con el código '{cod}' ('{existente[2]}').")
                 return False
 
-        nom = input("Ingrese el nombre del plato: ").strip()
-        precio = float(input("Ingrese el precio del plato: ").strip())
-        if precio <= 0:
-            print("El precio debe ser mayor a 0.")
+        # Si es un plato nuevo
+        datos = pedir_datos_plato()
+        if not datos:
             return False
+        nom, precio, desc, cat = datos
 
-        desc = input("Ingrese la descripción del plato: ").strip()
-        print("Categorías disponibles: 1-Desayuno, 2-Almuerzo, 3-Postre")
-        cat = int(input("Seleccione el ID de categoría (1-3): ").strip())
-        if cat not in [1, 2, 3]:
-            print("Categoría no válida. Debe ser 1, 2 o 3.")
-            return False
-
-        ordensql = "INSERT INTO platos (codigo, nombre, precio, descripcion, id_categoria, disponible) VALUES (%s, %s, %s, %s, %s, TRUE)"
+        ordensql = """
+            INSERT INTO platos (codigo, nombre, precio, descripcion, id_categoria, disponible) 
+            VALUES (%s, %s, %s, %s, %s, TRUE)
+        """
         cursor.execute(ordensql, (cod, nom, precio, desc, cat))
         conexion.commit()
         sincronizar_con_menu()
         print("-" * 40)
-        print("¡Plato registrado exitosamente en la base de datos!")
+        print(f"¡Plato '{nom}' registrado exitosamente en la base de datos!")
         return True
     except Exception as e:
         conexion.rollback()
@@ -186,10 +202,6 @@ def consultar_plato():
         print(f"Error al consultar: {e}")
     finally:
         cursor.close()
-
-
-# Alias para retrocompatibilidad con codigo anterior
-consultaxplato = consultar_plato
 
 
 def consulta_todos_platos():
@@ -284,7 +296,7 @@ def actualiza_plato():
 
 
 def eliminar_plato():
-    """DELETE lógico: Da de baja un plato en la base de datos."""
+    """DELETE lógico: Da de baja un plato en la base de datos cambiando su estado a disponible = FALSE."""
     if not esta_conectado():
         print("\n[ERROR BD] No hay conexión activa a la base de datos PostgreSQL.")
         return
@@ -320,12 +332,9 @@ def eliminar_plato():
         cursor.close()
 
 
-# Alias para retrocompatibilidad
-deletplato = eliminar_plato
-
-
 def obtener_catalogo_bd():
-    """Consulta los platos disponibles en BD para alimentar menu.py (fuente de verdad unica)."""
+    """Consulta los platos disponibles en BD para alimentar menu.py (fuente de verdad única).
+    Retorna un diccionario de platos (puede estar vacío {} si no hay platos disponibles), o None si hay error."""
     if not esta_conectado():
         return None
 
@@ -354,7 +363,7 @@ def obtener_catalogo_bd():
             }
         return catalogo
     except Exception as e:
-        print(f"[BD] Error al cargar catálogo desde BD: {e}")
+        print(f"[BD] Error al consultar catálogo de platos: {e}")
         return None
     finally:
         cursor.close()
@@ -363,15 +372,19 @@ def obtener_catalogo_bd():
 def sincronizar_con_menu():
     """Sincroniza el catálogo de la BD con el diccionario en memoria de menu.py."""
     if not esta_conectado():
-        return
+        return False
     try:
         import menu
         cat_bd = obtener_catalogo_bd()
-        if cat_bd:
+        if cat_bd is not None:
+            # cat_bd puede ser un diccionario con platos o {} si se retiraron todos
             menu.PLATOS.clear()
             menu.PLATOS.update(cat_bd)
-    except Exception:
-        pass
+            return True
+        return False
+    except Exception as e:
+        print(f"[BD] Error al sincronizar con el menú: {e}")
+        return False
 
 
 def guardar_pedido_bd(cliente, orden, subtotal, impoconsumo, total):
@@ -412,7 +425,7 @@ def guardar_pedido_bd(cliente, orden, subtotal, impoconsumo, total):
 
 
 def terminar():
-    """Cierra la conexion con la base de datos."""
+    """Cierra la conexión con la base de datos."""
     global conexion
     if esta_conectado():
         conexion.close()

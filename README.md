@@ -11,12 +11,11 @@ Sistema interactivo de gestión para restaurante desarrollado en Python con pers
 
 ## 🏗️ Arquitectura y Estructura del Proyecto
 
-* **`main.py`**: Punto de entrada del programa. Controla el menú interactivo, la navegación por categorías, flujo de facturación y el submenú de administración.
-* **`crud_restaurante.py`**: Módulo central de base de datos. Implementa las operaciones CRUD completas en PostgreSQL (`INSERT`, `SELECT`, `UPDATE`, `DELETE` lógico), sincronización bidireccional y fallback local si la BD no está disponible.
-* **`menu.py`**: Catálogo de productos (`PLATOS`). Sirve como respaldo local cuando no hay base de datos y se sincroniza en tiempo real con PostgreSQL cuando la BD está conectada.
+* **`main.py`**: Punto de entrada del programa. Controla el menú interactivo, la navegación por categorías, flujo de pedidos, facturación y el submenú de administración.
+* **`crud_restaurante.py`**: Módulo central de base de datos. Implementa las operaciones CRUD completas en PostgreSQL (`INSERT`, `SELECT`, `UPDATE`, `DELETE` lógico), actualización de la carta en memoria y fallback local si la BD no está disponible.
+* **`menu.py`**: Catálogo de productos (`PLATOS`). Contiene la carta base predeterminada y se actualiza desde PostgreSQL cuando la base de datos está conectada.
 * **`restaurant.py`**: Lógica de gestión de pedidos. Maneja el carrito (`orden_actual`), cálculo de subtotales, impoconsumo (8%), emisión de factura en archivo `.txt` y registro transaccional en la BD.
 * **`titles.py`**: Formatos visuales, banners, encabezados ASCII y la función multiplataforma para limpiar pantalla.
-* **`database.py`**: Módulo fachada que garantiza retrocompatibilidad con las funciones del docente.
 * **`restaurante.sql`**: Script DDL y DML para la creación de las 4 tablas relacionales (`categorias`, `platos`, `pedidos`, `detalle_pedidos`) y la carga inicial de los 25 platos.
 
 ---
@@ -25,14 +24,14 @@ Sistema interactivo de gestión para restaurante desarrollado en Python con pers
 
 ### 1. Requisitos
 * Python 3.10 o superior.
-* PostgreSQL 12 o superior (opcional pero recomendado para persistencia y panel CRUD).
+* PostgreSQL 12 o superior (opcional; si no está activo, el sistema funciona normalmente en modo local).
 
 ### 2. Dependencias de Python
 Instalar el conector de PostgreSQL para Python:
 ```bash
 pip install psycopg2-binary
 ```
-*(Nota: Si no se instala `psycopg2`, el sistema funcionará normalmente en **Modo Local**).*
+*(Nota: Si no se instala `psycopg2`, el sistema funcionará normalmente en **Modo Local** con la carta interna).*
 
 ---
 
@@ -80,10 +79,10 @@ export DB_PORT="5432"
 
 ## 📋 Funcionalidades Principales
 
-1. **Tolerancia a fallos:** Si PostgreSQL está apagado o no instalado, el sistema arranca limpiamente en **Modo Local** sin romperse.
-2. **Fuente de verdad única:** Si la base de datos está conectada, el menú de pedidos lee directamente los platos disponibles de PostgreSQL. Si registras o retiras un plato en la Opción 7 (Admin), la carta se actualiza de inmediato.
+1. **Tolerancia a fallos:** Si PostgreSQL está apagado o no instalado, el sistema arranca limpiamente en **Modo Local** mostrando el estado en pantalla sin romperse.
+2. **Fuente de verdad única:** Si la base de datos está conectada, el menú de pedidos se actualiza desde PostgreSQL. Si registras, modificas o retiras un plato en la Opción 7 (Admin), la carta se actualiza de inmediato para los pedidos.
 3. **Panel de Administración (CRUD Completo):**
-   * **`INSERT`**: Registrar nuevos platos con validación de categorías y precio.
+   * **`INSERT`**: Registrar nuevos platos con validación de categorías y precio (o reactivar platos retirados).
    * **`SELECT`**: Consulta individual por código y listado tabular ordenado de la carta.
    * **`UPDATE`**: Modificación de nombres y precios.
    * **`DELETE`**: Retiro lógico (`disponible = FALSE`) protegiendo el histórico de pedidos.
