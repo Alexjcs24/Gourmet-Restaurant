@@ -119,11 +119,16 @@ def generar_factura(nombre_cliente="Consumidor Final"):
     # Persistencia en PostgreSQL si el modulo esta disponible
     try:
         import crud_restaurante as cr
-        id_ped = cr.guardar_pedido_bd(nombre_cliente, orden_actual, subtotal, iva, total)
-        if id_ped:
-            print(f"[PostgreSQL] Pedido registrado en la base de datos con ID #{id_ped}.")
-    except Exception:
-        pass
+        if cr.esta_conectado():
+            id_ped = cr.guardar_pedido_bd(nombre_cliente, orden_actual, subtotal, iva, total)
+            if id_ped:
+                print(f"[PostgreSQL] Pedido registrado en la base de datos con ID #{id_ped}.")
+            else:
+                print("[AVISO] La factura se generó en archivo, pero no pudo registrarse en PostgreSQL.")
+        else:
+            print("[MODO LOCAL] Factura emitida sin persistencia en base de datos (PostgreSQL no conectado).")
+    except Exception as e:
+        print(f"[AVISO BD] Error al intentar guardar en base de datos: {e}")
 
     # Limpiar orden luego de pagar
     orden_actual.clear()

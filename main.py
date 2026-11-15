@@ -50,20 +50,24 @@ def menu_administrador():
         print("=" * 50)
         print("    PANEL DE ADMINISTRACIÓN Y BASE DE DATOS    ")
         print("=" * 50)
+        estado_bd = "CONECTADO A POSTGRESQL" if cr.esta_conectado() else "MODO LOCAL (SIN CONEXIÓN BD)"
+        print(f" Estado: [{estado_bd}]")
+        print("-" * 50)
         print("1. Registrar nuevo plato (INSERT)")
         print("2. Consultar plato específico (SELECT)")
         print("3. Consultar todos los platos en PostgreSQL (SELECT)")
         print("4. Actualizar información de un plato (UPDATE)")
         print("5. Retirar plato de la carta (DELETE)")
+        print("6. Reintentar conexión a PostgreSQL")
         print("0. Volver al Menú Principal")
         print("=" * 50)
 
-        op = input("Seleccione una opción (0-5): ").strip()
+        op = input("Seleccione una opción (0-6): ").strip()
         if op == "1":
             cr.registrar_plato()
             input("\nPresione ENTER para continuar...")
         elif op == "2":
-            cr.consultaxplato()
+            cr.consultar_plato()
             input("\nPresione ENTER para continuar...")
         elif op == "3":
             cr.consulta_todos_platos()
@@ -72,7 +76,15 @@ def menu_administrador():
             cr.actualiza_plato()
             input("\nPresione ENTER para continuar...")
         elif op == "5":
-            cr.deletplato()
+            cr.eliminar_plato()
+            input("\nPresione ENTER para continuar...")
+        elif op == "6":
+            cr.conectar_bd()
+            if cr.esta_conectado():
+                cr.sincronizar_con_menu()
+                print("¡Conectado exitosamente y menú sincronizado con la base de datos!")
+            else:
+                print("No se pudo conectar a PostgreSQL.")
             input("\nPresione ENTER para continuar...")
         elif op == "0":
             break
@@ -82,8 +94,10 @@ def menu_administrador():
 
 
 def main():
-    # Establecer conexion con PostgreSQL (estilo explicado por el docente)
-    cr.conectar_bd("restaurante_gourmet", "alexcs", "", "localhost", "5432")
+    # Establecer conexion con PostgreSQL (con autodeteccion y respaldo local si no esta disponible)
+    conectado = cr.conectar_bd()
+    if conectado:
+        cr.sincronizar_con_menu()
 
     t.limpiar_pantalla()
     t.banner_bienvenida()

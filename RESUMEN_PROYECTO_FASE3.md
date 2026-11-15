@@ -43,8 +43,8 @@ SELECT * FROM detalle_pedidos;
 
 ---
 
-## 3. Claves para la Sustentación en Video (Sin sospechas de IA)
-Para la sustentación oral, dominar estos conceptos clave:
+## 3. Conceptos Clave para la Sustentación Oral y Metodológica
+Para la sustentación oral del proyecto integrador, es indispensable dominar estos conceptos técnicos fundamentales:
 1. **`psycopg2`**: Librería controladora que permite a Python comunicarse con el motor de PostgreSQL.
 2. **`cursor`**: Objeto puente que envía comandos SQL y recupera los registros consultados (`fetchone`, `fetchall`).
 3. **`commit()`**: Método obligatorio que confirma y consolida las transacciones (`INSERT`, `UPDATE`, `DELETE`) en el disco duro.
